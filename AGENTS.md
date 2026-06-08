@@ -12,7 +12,8 @@ binary save-file parser/editor, not a game clone, ROM set, or walkthrough site.
 - `main.ipynb` is for reverse-engineering experiments with `construct`.
 - `SINARIO.DAT` is the default scenario input.
 - `save/` holds local save samples and is ignored by Git.
-- `pyproject.toml` and `uv.lock` define Python 3.14 and dependencies.
+- `.venv/` is the project-local Python 3.14 environment.
+- `requirements.txt` lists runtime packages for `pip install`.
 
 Keep stable parsing/editing code in modules. Promote notebook work only after
 offsets, byte order, encodings, and field sizes are confirmed.
@@ -41,12 +42,20 @@ sources conflict, prefer direct DAT evidence for parser behavior.
 
 ## Build, Test, and Development Commands
 
-- `uv sync --python 3.14` updates the project environment.
-- `uv run --python 3.14 python main.py` parses `SINARIO.DAT` when a CLI exists.
-- `uv run --python 3.14 python main.py path/to/SAVE.DAT` parses a specific save file.
-- `python3.14 -m compileall .` performs a basic syntax check.
+Before running any project Python command, activate the project environment:
 
-If `.venv` is invalid, rebuild it before using `uv run`.
+- `source .venv/bin/activate`
+
+After activation:
+
+- `python -m pip install -r requirements.txt` installs runtime dependencies.
+- `python -m pip install pycodestyle` installs the current style-check tool.
+- `python main.py` parses `SINARIO.DAT` when a CLI exists.
+- `python main.py path/to/SAVE.DAT` parses a specific save file.
+- `pycodestyle main.py garyouden` runs style checks when the dev dependencies are installed.
+
+Do not use `uv run` for project commands. If `.venv` is invalid, rebuild or repair
+the project-local virtual environment first, then activate it again.
 
 ## Coding Style & Naming Conventions
 
