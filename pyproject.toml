@@ -7,3 +7,8 @@ requires-python = ">=3.14"
 dependencies = [
     "construct>=2.10.70",
 ]
+
+[dependency-groups]
+dev = [
+    "pycodestyle>=2.14.0",
+]
