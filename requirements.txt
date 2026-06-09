@@ -1,1 +1,2 @@
 construct==2.10.70
+openpyxl==3.1.5
