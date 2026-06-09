@@ -10,10 +10,20 @@ binary save-file parser/editor, not a game clone, ROM set, or walkthrough site.
 ## Project Structure & Module Organization
 
 - `main.ipynb` is for reverse-engineering experiments with `construct`.
-- `SINARIO.DAT` is the default scenario input.
+- `SINARIO.DAT` is the bundled scenario sample.
 - `save/` holds local save samples and is ignored by Git.
 - `.venv/` is the project-local Python 3.14 environment.
-- `requirements.txt` lists runtime packages for `pip install`.
+- `requirements.txt` lists runtime packages for `pip install`, currently
+  including `construct` for binary parsing and `openpyxl` for workbook export.
+- `main.py` is only a thin compatibility entry point.
+- `garyouden/cli.py` owns command-line parsing.
+- `garyouden/layout.py` owns binary offsets, record sizes, capacities, and
+  `construct` layouts.
+- `garyouden/models.py` owns parsed dataclasses.
+- `garyouden/parser.py` owns DAT file reading and parsing. Prefer
+  `read_dat_file()` for new code.
+- `garyouden/summaries.py` owns JSON/text summaries.
+- `garyouden/workbook.py` owns XLSX export.
 
 Keep stable parsing/editing code in modules. Promote notebook work only after
 offsets, byte order, encodings, and field sizes are confirmed.
@@ -49,10 +59,14 @@ Before running any project Python command, activate the project environment:
 After activation:
 
 - `python -m pip install -r requirements.txt` installs runtime dependencies.
-- `python -m pip install pycodestyle` installs the current style-check tool.
-- `python main.py` parses `SINARIO.DAT` when a CLI exists.
+- `python main.py SINARIO.DAT` parses the bundled scenario sample.
 - `python main.py path/to/SAVE.DAT` parses a specific save file.
+- `python main.py path/to/SAVE.DAT --xlsx path/to/output.xlsx` exports a workbook.
 - `pycodestyle main.py garyouden` runs style checks when the dev dependencies are installed.
+
+The CLI requires the DAT path; do not reintroduce a default input path. XLSX
+export creates sheets for the documented major sections: `剧本信息`, `势力`,
+`外交`, `城池信息`, `军团信息`, `武将信息`, and `未知区块`.
 
 Do not use `uv run` for project commands. If `.venv` is invalid, rebuild or repair
 the project-local virtual environment first, then activate it again.
@@ -62,6 +76,9 @@ the project-local virtual environment first, then activate it again.
 Use 4-space indentation, type hints, `pathlib.Path`, dataclasses for parsed
 records, and constants such as `SCENARIO_SIZE` or `FORCE_TABLE_OFFSET`. Prefer
 `struct` or `construct` over ad hoc slicing. Validate lengths before unpacking.
+When exporting strings to Excel, escape control characters instead of writing
+them directly because `openpyxl` rejects values containing bytes such as
+`U+0000` from unused DAT slots.
 
 ## Testing Guidelines
 
